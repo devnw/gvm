@@ -78,6 +78,7 @@ then
     which go>/dev/null
     if [ $? -ne 0 ]; then
         echo "Installing go from source requires an existing go installation"
+        exit 1
     fi
 
     if [ ! -d $srcd ]; then
@@ -110,13 +111,21 @@ else
         pkg="go$version.$os-$arch.tar.gz"
         url="$dlroot$pkg"
         echo "Downloading $url"
-        echo "root $versionroot"
-        curl $url > $pkg
+        curl -f $url > $pkg
+        if [ $? -ne 0 ]; then
+            echo "Unable to download $url"
+            exit 1
+        fi
 
         echo "Making $versionroot"
         rm -rf $versionroot
         mkdir -p $versionroot
         tar -C $versionroot -xzf $pkg
+        if [ $? -ne 0 ]; then
+            echo "Unable to extract $pkg"
+            rm -rf $versionroot
+            exit 1
+        fi
         rm $pkg
     fi
 
