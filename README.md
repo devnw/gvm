@@ -4,10 +4,10 @@ Go Version Manager
 
 ## Install
 
-To use the command below directly ensure that ~/bin is in your PATH.
+To use the command below directly ensure that $HOME/bin is in your PATH.
 
 ```bash
-curl -L https://github.com/devnw/gvm/releases/download/latest/gvm > ~/bin/gvm && chmod +x ~/bin/gvm
+curl -L https://github.com/devnw/gvm/releases/download/latest/gvm > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
 ```
 
 ## Usage
