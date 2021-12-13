@@ -1,11 +1,49 @@
 #!/bin/sh
 
+function help() {
+    echo "Go Version Manager"
+    echo "Usage: gvm <version> [<args>]\n"
+
+    echo "  To install a released version"
+    echo "  Example: gvm install 1.15.5\n"
+
+    echo "  To install the latest development"
+    echo "  Example: gvm install next\n"
+
+    echo "  To update an existing development version"
+    echo "  Example: gvm install next --update"
+}
+
+if [[ "$1" == ""  || "$1" == "-h" || "$1" == "--help" ]]
+then
+    help
+
+    if [[ "$1" == ""  ]]
+    then
+        exit 1
+    fi
+
+    exit 0
+fi
+
+if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+    if [[ "$1" != "next" ]]; then
+        echo "$1 is not a valid version\n"
+
+        help
+
+        exit 1
+    fi
+fi
+
 wd=$(pwd)
 gvmroot="$HOME/.gvm"
 srcd="$gvmroot/next"
 version="$1"
 symln=$gvmroot/go
 versionroot="$gvmroot/$version"
+golanggit="https://go.googlesource.com/go"
+dlroot="https://dl.google.com/go/"
 
 
 arch="amd64"
@@ -43,10 +81,10 @@ then
 
     if [ ! -d $srcd ]; then
         echo "Cloning go source"
-        git clone https://github.com/golang/go.git $srcd
+        git clone $golanggit $srcd
     fi
     
-    if [[ "$2" == "update" ]]
+    if [[ "$2" == "--update" ]]
     then
         cd $srcd
 
@@ -65,7 +103,7 @@ then
 else
     if [ ! -d $versionroot ]; then
         pkg="go$version.$os-$arch.tar.gz"
-        url="https://dl.google.com/go/$pkg"
+        url="$dlroot$pkg"
         echo "Downloading $url"
         echo "root $versionroot"
         curl $url > $pkg
