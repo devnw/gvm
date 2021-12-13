@@ -1,0 +1,102 @@
+#!/bin/sh
+
+wd=$(pwd)
+gvmroot="$HOME/.gvm"
+srcd="$gvmroot/next"
+version="$1"
+symln=$gvmroot/go
+versionroot="$gvmroot/$version"
+
+
+arch="amd64"
+uname -a | grep "x86_64"
+if [ $? -ne 0 ]; then
+    echo "Configuring for ARM64 Architecture"
+    arch="arm64"
+fi
+
+os="linux"
+if [[ "$OSTYPE" == "darwin"* ]]
+then
+    os="darwin"
+else
+    echo "Unsupported OS"
+    exit 1
+fi
+
+if [ ! -d $gvmroot ]; then
+        echo "Adding ~/.gvm directory for go installs"
+        mkdir $gvmroot
+fi
+
+if [[ ! -L "$symln" && -d "$symln" ]]; then
+    rm -rf $symln >/dev/null
+fi
+
+if [[ "$version" == "next" ]]
+then
+    echo "Installing Go $version"
+    which go>/dev/null
+    if [ $? -ne 0 ]; then
+        echo "Installing go from source requires an existing go installation"
+    fi
+
+    if [ ! -d $srcd ]; then
+        echo "Cloning go source"
+        git clone https://github.com/golang/go.git $srcd
+    fi
+    
+    if [[ "$2" == "update" ]]
+    then
+        cd $srcd
+
+        git checkout master
+        git pull
+
+        cd $srcd/src/
+        ./all.bash
+
+        cd $wd
+    fi
+
+    echo "updating symlink $symln => $versionroot/bin"
+    mkdir $symln
+    ln -s $versionroot/bin $symln
+else
+    if [ ! -d $versionroot ]; then
+        pkg="go$version.$os-$arch.tar.gz"
+        url="https://dl.google.com/go/$pkg"
+        echo "Downloading $url"
+        echo "root $versionroot"
+        curl $url > $pkg
+
+        echo "Making $versionroot"
+        rm -rf $versionroot
+        mkdir -p $versionroot
+        tar -C $versionroot -xzf $pkg
+        rm $pkg
+    fi
+
+    echo "updating symlink $symln => $versionroot/go/bin"
+    mkdir $symln
+    ln -s $versionroot/go/bin $symln
+fi
+
+if ! echo $PATH | grep -q $symln/bin; then
+    echo "Adding $symln/bin to PATH"
+    
+    if [[ "$SHELL" == "/bin/zsh" ]]
+    then
+        echo "export PATH=\"$symln/bin:\$PATH\"" >> $HOME/.zshrc
+        exec zsh
+    else
+        echo "export PATH=\"$symln/bin:\$PATH\"" >> $HOME/.bashrc
+        source $HOME/.bashrc
+    fi
+fi
+
+pathgo=$(which go)
+if [[ $pathgo != "$symln/bin/go" ]]
+then
+    echo "GVM is shadowed by $pathgo in your PATH. Please update your PATH to use $symln/bin first"
+fi
