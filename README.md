@@ -7,14 +7,7 @@ Go Version Manager
 To use the command below directly ensure that ~/bin is in your PATH.
 
 ```bash
-curl https://raw.githubusercontent.com/devnw/gvm/main/gvm > ~/bin/gvm && chmod +x ~/bin/gvm
-```
-
-To pull a tagged version of `gvm` replace main with the tag name.
-
-**Example**
-```bash
-curl https://raw.githubusercontent.com/devnw/gvm/v0.0.1/gvm > ~/bin/gvm && chmod +x ~/bin/gvm
+curl -L https://github.com/devnw/gvm/releases/download/latest/gvm > ~/bin/gvm && chmod +x ~/bin/gvm
 ```
 
 ## Usage
