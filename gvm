@@ -44,6 +44,7 @@ symln=$gvmroot/go
 versionroot="$gvmroot/$version"
 golanggit="https://go.googlesource.com/go"
 dlroot="https://dl.google.com/go/"
+update=$2
 
 
 arch="amd64"
@@ -82,9 +83,13 @@ then
     if [ ! -d $srcd ]; then
         echo "Cloning go source"
         git clone $golanggit $srcd
+
+        # Add update flag since source repo
+        # did not already exist
+        update="--update"
     fi
     
-    if [[ "$2" == "--update" ]]
+    if [[ "$update" == "--update" ]]
     then
         cd $srcd
 
