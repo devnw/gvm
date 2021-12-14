@@ -53,9 +53,9 @@ function override() {
         sudo rm -rf $defaultgoroot
     fi
 
-    echo "Creating for $defaultgoroot to $versionroot"
+    echo "Creating for $defaultgoroot to $symln"
     sudo mkdir -p $defaultgoroot
-    sudo ln -s $versionroot/go/bin $defaultgoroot
+    sudo ln -s $symln/bin $defaultgoroot
 }
 
 arch="amd64"
@@ -145,10 +145,16 @@ else
     ln -s $versionroot/go/bin $symln
 fi
 
-read -p "Do you wish to override /usr/local/go [Yes: Y or y | No: Enter]? " yn
-if [[ "$yn" == "Y" || "$yn" == "y" ]]
-then
-    override
+# Check to see if the default root exists and if it is a symlink
+# prior to prompting the user to override it
+if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]; then
+    read -p "Do you wish to override /usr/local/go [Yes: Y or y | No: Enter]? " yn
+
+    # Only trigger on `Y` or `y`
+    if [[ "$yn" == "Y" || "$yn" == "y" ]]
+    then
+        override
+    fi
 fi
 
 if ! echo $PATH | grep -q $symln/bin; then
