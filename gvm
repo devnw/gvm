@@ -49,9 +49,11 @@ update=$2
 
 function override() {
     if [ -d $defaultgoroot ]; then
+        echo "Removing existing $defaultgoroot"
         sudo rm -rf $defaultgoroot
     fi
 
+    echo "Creating for $defaultgoroot to $versionroot"
     sudo mkdir -p $defaultgoroot
     sudo ln -s $versionroot/go/bin $defaultgoroot
 }
