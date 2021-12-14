@@ -1,17 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 
-function help() {
-    echo "Go Version Manager"
-    echo "Usage: gvm <version> [<args>]\n"
+help() {
+    printf "Go Version Manager
+    Usage: gvm <version> [<args>]\n
+      To install a released version
+      Example: gvm install 1.15.5\n
 
-    echo "  To install a released version"
-    echo "  Example: gvm install 1.15.5\n"
+      To install the latest development
+      Example: gvm install next\n
 
-    echo "  To install the latest development"
-    echo "  Example: gvm install next\n"
-
-    echo "  To update an existing development version"
-    echo "  Example: gvm install next --update"
+      To update an existing development version
+      Example: gvm install next --update\n"
 }
 
 if [[ "$1" == ""  || "$1" == "-h" || "$1" == "--help" ]]
@@ -28,7 +27,7 @@ fi
 
 if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
     if [[ "$1" != "next" ]]; then
-        echo "$1 is not a valid version\n"
+        printf "%s is not a valid version\n" "$1"
 
         help
 
@@ -46,55 +45,68 @@ defaultgoroot="/usr/local/go"
 golanggit="https://go.googlesource.com/go"
 dlroot="https://dl.google.com/go/"
 update=$2
+branch="master"
 
 function override() {
     if [ -d $defaultgoroot ]; then
-        echo "Removing existing $defaultgoroot"
-        sudo rm -rf $defaultgoroot
+        printf "Removing existing %s\n" "$defaultgoroot"
+        sudo rm -rf $defaultgoroot || \
+            printf "Unable to remove existing %s\n" "$defaultgoroot" \
+            exit 1
     fi
 
-    echo "Creating for $defaultgoroot to $symln"
-    sudo mkdir -p $defaultgoroot
-    sudo ln -s $symln/bin $defaultgoroot
+    printf "Creating for %s to %s\n" "$defaultgoroot" "$symln"
+    sudo mkdir -p $defaultgoroot || \
+        printf "Unable to create new to symlink %s\n" "$defaultgoroot" \
+        exit 1
+
+    sudo ln -s "$symln"/bin "$defaultgoroot" || \
+        printf "Unable to symlink new %s\n" "$defaultgoroot" \
+        exit 1
 }
 
 arch="amd64"
-uname -a | grep "x86_64"
-if [ $? -ne 0 ]; then
-    echo "Configuring for ARM64 Architecture"
+uname -a | grep "x86_64" || \
     arch="arm64"
-fi
+    printf "Configuring for %s Architecture\n" "$arch" \
+    
 
-os="linux"
 if [[ "$OSTYPE" == "darwin"* ]]
 then
     os="darwin"
+elif [[ "$OSTYPE" == "linux"* ]]
+then
+    os="linux"
+elif [[ "$OSTYPE" == "freebsd"* ]]
+then
+    os="freebsd"
 else
-    echo "Unsupported OS"
+    printf "Unsupported OS\n"
     exit 1
 fi
 
-if [ ! -d $gvmroot ]; then
-        echo "Adding ~/.gvm directory for go installs"
-        mkdir $gvmroot
+if [[ ! -d "$gvmroot" ]]; then
+        printf "Adding ~/.gvm directory for go installs\n"
+        mkdir "$gvmroot" || printf "Error creating %s" "$gvmroot"; exit 1
 fi
 
 if [[ ! -L "$symln" && -d "$symln" ]]; then
-    rm -rf $symln >/dev/null
+    rm -rf "$symln" >/dev/null
+    mkdir "$symln" || \
+            printf "Unable to create directory %s" "$symln"
 fi
 
 if [[ "$version" == "next" ]]
 then
-    echo "Installing Go $version"
-    which go>/dev/null
-    if [ $? -ne 0 ]; then
-        echo "Installing go from source requires an existing go installation"
+    printf "Installing Go %s\n" "$version"
+    which go>/dev/null || \
+        printf "Installing go from %s requires an existing go installation\n" "$golanggit" \
         exit 1
-    fi
 
-    if [ ! -d $srcd ]; then
-        echo "Cloning go source"
-        git clone $golanggit $srcd
+    if [ ! -d "$srcd" ]; then
+        printf "Cloning go source\n"
+        git clone "$golanggit" "$srcd" || \
+            printf "Error cloning %s" "$golanggit"; exit 1
 
         # Add update flag since source repo
         # did not already exist
@@ -103,52 +115,55 @@ then
     
     if [[ "$update" == "--update" ]]
     then
-        cd $srcd
+        cd "$srcd" || exit 1
 
-        git checkout master
-        git pull
+        git checkout "$branch" || \
+            printf "Checkout of %s failed" "$branch"; exit 1
+        git pull || \
+            printf "git pull failed for %s" "$branch"; exit 1
 
-        cd $srcd/src/
-        ./all.bash
+        cd "$srcd/src/" || \
+            printf "Unable to move to %s" "$srcd/src/"; exit 1
+        ./all.bash || \
+            printf "Failure installing go from %s" "$branch"
 
-        cd $wd
+        cd "$wd" || exit 1
     fi
-
-    echo "updating symlink $symln => $versionroot/bin"
-    mkdir $symln
-    ln -s $versionroot/bin $symln
+    
+    # Set correct path for symlink re-map
+    lnsrc="$versionroot/bin"
 else
-    if [ ! -d $versionroot ]; then
+    if [[ ! -d "$versionroot" ]]; then
         pkg="go$version.$os-$arch.tar.gz"
         url="$dlroot$pkg"
-        echo "Downloading $url"
-        curl -f $url > $pkg
-        if [ $? -ne 0 ]; then
-            echo "Unable to download $url"
-            exit 1
-        fi
+        printf "Downloading %s\n" "$url"
+        curl -f "$url" > "$pkg" || \
+            printf "Unable to curl %s" "$url"
 
-        echo "Making $versionroot"
-        rm -rf $versionroot
-        mkdir -p $versionroot
-        tar -C $versionroot -xzf $pkg
-        if [ $? -ne 0 ]; then
-            echo "Unable to extract $pkg"
-            rm -rf $versionroot
+        printf "Making %s\n" "$versionroot"
+        rm -rf "$versionroot"
+        mkdir -p "$versionroot"
+        tar -C "$versionroot" -xzf "$pkg" || \
+            printf "Unable to extract %s" "$pkg" \
+            rm -rf "$versionroot" \
             exit 1
-        fi
-        rm $pkg
+            
+        rm "$pkg"
     fi
 
-    echo "updating symlink $symln => $versionroot/go/bin"
-    mkdir $symln
-    ln -s $versionroot/go/bin $symln
+    # Set correct path for symlink re-map
+    lnsrc="$versionroot/go/bin"
 fi
+
+printf "Updating symlink %s => %s/bin\n" "$symln" "$lnsrc"
+ln -s "$lnsrc" "$symln" || \
+        printf "Unable to symlink directory %s" "$lnsrc"
 
 # Check to see if the default root exists and if it is a symlink
 # prior to prompting the user to override it
 if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]; then
-    read -p "Do you wish to override /usr/local/go [Yes: Y or y | No: Enter]? " yn
+    read -rp "Do you wish to override /usr/local/go \
+    [Yes: Y or y | No: Enter]? " yn
 
     # Only trigger on `Y` or `y`
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
@@ -157,21 +172,26 @@ if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]; then
     fi
 fi
 
-if ! echo $PATH | grep -q $symln/bin; then
-    echo "Adding $symln/bin to PATH"
+if ! printf "%s" "$PATH" | grep -q "$symln/bin"; then
+    printf "Adding %s/bin to PATH\n" "$symln"
     
-    if [[ "$SHELL" == "/bin/zsh" ]]
+    path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$symln")
+
+    if [ "$SHELL" == "/bin/zsh" ]
     then
-        echo "export PATH=\"$symln/bin:\$PATH\"" >> $HOME/.zshrc
+        printf "%s" "$path" >> "$HOME/.zshrc"
         exec zsh
     else
-        echo "export PATH=\"$symln/bin:\$PATH\"" >> $HOME/.bashrc
-        source $HOME/.bashrc
+        printf "%s" "$path" >> "$HOME/.bashrc"
+        "$HOME"/.bashrc
     fi
 fi
 
 pathgo=$(which go)
-if [[ $pathgo != "$symln/bin/go" ]]
+if [ "$pathgo" != "$symln/bin/go" ]
 then
-    echo "GVM is shadowed by $pathgo in your PATH. Please update your PATH to use $symln/bin first"
+    printf "GVM is shadowed by %s in your PATH. Please update your PATH to \
+    use %s/bin first\n" \
+    "$pathgo" \
+    "$symln"
 fi
