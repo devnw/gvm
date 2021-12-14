@@ -42,10 +42,19 @@ srcd="$gvmroot/next"
 version="$1"
 symln=$gvmroot/go
 versionroot="$gvmroot/$version"
+defaultgoroot="/usr/local/go"
 golanggit="https://go.googlesource.com/go"
 dlroot="https://dl.google.com/go/"
 update=$2
 
+function override() {
+    if [ -d $defaultgoroot ]; then
+        sudo rm -rf $defaultgoroot
+    fi
+
+    sudo mkdir -p $defaultgoroot
+    sudo ln -s $versionroot/go/bin $defaultgoroot
+}
 
 arch="amd64"
 uname -a | grep "x86_64"
@@ -132,6 +141,12 @@ else
     echo "updating symlink $symln => $versionroot/go/bin"
     mkdir $symln
     ln -s $versionroot/go/bin $symln
+fi
+
+read -p "Do you wish to override /usr/local/go [Yes: Y or y | No: Enter]? " yn
+if [[ "$yn" == "Y" || "$yn" == "y" ]]
+then
+    override
 fi
 
 if ! echo $PATH | grep -q $symln/bin; then
