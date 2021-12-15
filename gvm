@@ -2,7 +2,7 @@
 
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
-SCRIPTVERSION="$(git describe --tags --always)"
+SCRIPTVERSION="dev"
 ###############################################################################
 
 update() {
@@ -41,6 +41,7 @@ update() {
                 fi
 
                 printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
+                $0 "$@"
             fi
         fi
     fi
@@ -61,7 +62,7 @@ help() {
 }
 
 # Determine if the script is out of date and offer to update
-update
+update "$@"
 
 if [[ "$1" == "" || "$1" ==  "help"  || "$1" == "-h" || "$1" == "--help" ]]
 then
