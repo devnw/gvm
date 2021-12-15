@@ -229,6 +229,8 @@ then
         exec zsh
     else
         printf "%s" "$path" >> "$HOME/.bashrc"
+
+        # shellcheck disable=SC1091
         source "$HOME"/.bashrc
 
         if uname -a | grep Ubuntu&> /dev/null
