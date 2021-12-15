@@ -236,7 +236,7 @@ fi
 pathgo=$(which go)
 if [[ "$pathgo" != "$symln/bin/go" ]]
 then
-    printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s/bin first\n" \
+    printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s first\n" \
     "$pathgo" \
     "$symln"
 fi
