@@ -5,6 +5,11 @@
 SCRIPTVERSION="$(git describe --tags --always)"
 ###############################################################################
 
+# Update checks the published version of this script based on the SCRIPTVERSION
+# variable. If the version is different, it will give the user the option to
+# update the script. If the user chooses to update, it will download the new
+# version and replace the old one. It will then re-run the script using the new
+# version.
 update() {
 
     GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
