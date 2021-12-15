@@ -233,7 +233,7 @@ then
 
         if uname -a | grep Ubuntu&> /dev/null
         then
-            printf "For ubuntu you must run [source ~/.bashrc] or logout/login to complete path installation/n"
+            printf "For ubuntu you must run [source ~/.bashrc] or logout/login to complete path installation\n"
         fi
     fi
 fi
