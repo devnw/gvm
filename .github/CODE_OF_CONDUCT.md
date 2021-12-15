@@ -1,10 +1,10 @@
-## Community Code of Conduct v1.0
+# Community Code of Conduct v1.0
 
 This is Code of Conduct is based on the [CNCF Code of
 Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md).
 See the referred document for translated versions into different languages.
 
-### Contributor Code of Conduct
+## Contributor Code of Conduct
 
 As contributors and maintainers of this project, and in the interest of fostering
 an open and welcoming community, we pledge to respect all people who contribute
@@ -40,5 +40,5 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported by contacting the project maintainers or [Benji Vesterby](https://github.com/benjivesterby) directly via email [benji@benjiv.com](mailto:benji@benjiv.com).
 
 This Code of Conduct is adapted from the Contributor Covenant
-(http://contributor-covenant.org), version 1.2.0, available at
-http://contributor-covenant.org/version/1/2/0/
+(<http://contributor-covenant.org>), version 1.2.0, available at
+<http://contributor-covenant.org/version/1/2/0/>
