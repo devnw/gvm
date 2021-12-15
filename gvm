@@ -12,33 +12,36 @@ update() {
     EXPECTEDSUM=$(curl -sL "$SUMPATH")
     FILESUM=$(cat $0 | shasum -a 256)
 
-    if [[ "$EXPECTEDSUM" != "" && $FILESUM != "$EXPECTEDSUM" ]]
+    if [[ "$EXPECTEDSUM" != "Not Found" ]]
     then
-
-        printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
-
-        read -rp "[Yes: Y or y | No: Enter]? " yn
-
-        # Only trigger on `Y` or `y`
-        if [[ "$yn" == "Y" || "$yn" == "y" ]]
+        if [[ "$EXPECTEDSUM" != "" && $FILESUM != "$EXPECTEDSUM" ]]
         then
-            curl -sL "$GVMURL" > .gvm.tmp
-            DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
-            if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
-            then
-                printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
-                printf "Expected: %s\n" "$EXPECTEDSUM"
-                printf "Actual:   %s\n" "$DOWNLOADEDSUM"
-                exit 1
-            fi
 
-            if ! mv .gvm.tmp "$0"
-            then
-                printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
-                exit 1
-            fi
+            printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
 
-            printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
+            read -rp "[Yes: Y or y | No: Enter]? " yn
+
+            # Only trigger on `Y` or `y`
+            if [[ "$yn" == "Y" || "$yn" == "y" ]]
+            then
+                curl -sL "$GVMURL" > .gvm.tmp
+                DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
+                if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
+                then
+                    printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
+                    printf "Expected: %s\n" "$EXPECTEDSUM"
+                    printf "Actual:   %s\n" "$DOWNLOADEDSUM"
+                    exit 1
+                fi
+
+                if ! mv .gvm.tmp "$0"
+                then
+                    printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
+                    exit 1
+                fi
+
+                printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
+            fi
         fi
     fi
 }
