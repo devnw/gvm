@@ -65,7 +65,7 @@ function override() {
         fail "$(printf "Unable to create new to symlink %s\n" "$defaultgoroot")"
     fi
 
-    if ! sudo ln -sF "$symln"/bin "$defaultgoroot"
+    if ! sudo ln -sf "$symln"/bin "$defaultgoroot"
     then
         fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
     fi
@@ -198,7 +198,7 @@ else
 fi
 
 printf "Updating symlink %s => %s\n" "$symln" "$lnsrc"
-if ! ln -sF "$lnsrc" "$symln"
+if ! ln -sf "$lnsrc" "$symln"
 then
     fail "$(printf "Unable to symlink directory %s\n" "$lnsrc")"
 fi
