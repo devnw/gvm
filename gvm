@@ -229,7 +229,7 @@ then
         exec zsh
     else
         printf "%s" "$path" >> "$HOME/.bashrc"
-        "$HOME"/.bashrc
+        source "$HOME"/.bashrc
     fi
 fi
 
