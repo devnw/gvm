@@ -229,14 +229,17 @@ then
         exec zsh
     else
         printf "%s" "$path" >> "$HOME/.bashrc"
-        source "$HOME"/.bashrc
+        source ~/.bashrc
     fi
 fi
 
-pathgo=$(which go)
-if [[ "$pathgo" != "$symln/bin/go" ]]
+if which go
 then
-    printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s first\n" \
-    "$pathgo" \
-    "$symln"
+    pathgo=$(which go)
+    if [[ "$pathgo" != "$symln/bin/go" ]]
+    then
+        printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s first\n" \
+        "$pathgo" \
+        "$symln"
+    fi
 fi

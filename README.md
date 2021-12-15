@@ -44,8 +44,8 @@ build the latest development version, otherwise it will keep using the previousl
 currently active version at `$HOME/.gvm/go` which is then
 added to the beginning of the PATH.
 
-## Supported OSes
+## Supported OSes and Architectures
 
-- Linux
-- Mac OS X (ARM & Intel)
+- Linux (ARM64 / AMD64)
+- Mac OS X (ARM64 / AMD64)
 - FreeBSD
