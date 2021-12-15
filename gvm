@@ -46,7 +46,15 @@ update() {
                 fi
 
                 printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
-                exec "$@"
+                printf "%s\n" "$@"
+                if ! exec $0 "$@"
+                then 
+                    printf "Failed to execute new version of GVM [%s]\n" "$SCRIPTVERSION"
+                    exit 1
+                fi
+
+                printf "Successful update and execution"
+                exit 0
             fi
         fi
     fi
