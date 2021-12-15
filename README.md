@@ -2,6 +2,9 @@
 
 Go Version Manager
 
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+
 ## Install
 
 To use the command below directly ensure that $HOME/bin is in your PATH.
@@ -40,3 +43,9 @@ build the latest development version, otherwise it will keep using the previousl
 `gvm` creates a directory at `$HOME/.gvm` and stores all of the Go versions in it. It then creates a symlink to the
 currently active version at `$HOME/.gvm/go` which is then
 added to the beginning of the PATH.
+
+## Supported OSes
+
+- Linux
+- Mac OS X (ARM & Intel)
+- FreeBSD

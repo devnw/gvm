@@ -50,25 +50,35 @@ branch="master"
 function override() {
     if [ -d $defaultgoroot ]; then
         printf "Removing existing %s\n" "$defaultgoroot"
-        sudo rm -rf $defaultgoroot || \
-            printf "Unable to remove existing %s\n" "$defaultgoroot" \
-            exit 1
+        if ! sudo rm -rf $defaultgoroot
+        then
+            fail "$(printf "Unable to remove existing %s\n" "$defaultgoroot")"
+        fi
     fi
 
     printf "Creating for %s to %s\n" "$defaultgoroot" "$symln"
-    sudo mkdir -p $defaultgoroot || \
-        printf "Unable to create new to symlink %s\n" "$defaultgoroot" \
-        exit 1
+    if ! sudo mkdir -p $defaultgoroot
+    then
+        fail "$(printf "Unable to create new to symlink %s\n" "$defaultgoroot")"
+    fi
 
-    sudo ln -s "$symln"/bin "$defaultgoroot" || \
-        printf "Unable to symlink new %s\n" "$defaultgoroot" \
-        exit 1
+    if ! sudo ln -sF "$symln"/bin "$defaultgoroot"
+    then
+        fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
+    fi
+}
+
+function fail() {
+    printf "%s\n" "$1"
+    exit 1
 }
 
 arch="amd64"
-uname -a | grep "x86_64" || \
+if ! uname -a | grep "x86_64"
+then
     arch="arm64"
-    printf "Configuring for %s Architecture\n" "$arch" \
+    printf "Configuring for %s Architecture\n" "$arch"
+fi
     
 
 if [[ "$OSTYPE" == "darwin"* ]]
@@ -87,26 +97,34 @@ fi
 
 if [[ ! -d "$gvmroot" ]]; then
         printf "Adding ~/.gvm directory for go installs\n"
-        mkdir "$gvmroot" || printf "Error creating %s" "$gvmroot"; exit 1
+        if ! mkdir "$gvmroot" 
+        then
+            fail "$(printf "Error creating %s\n" "$gvmroot")"
+        fi
 fi
 
-if [[ ! -L "$symln" && -d "$symln" ]]; then
-    rm -rf "$symln" >/dev/null
-    mkdir "$symln" || \
-            printf "Unable to create directory %s" "$symln"
+printf "Checking for existing %s\n" "$versionroot"
+if [[ ! -d "$symln" ]]; then
+    if ! mkdir "$symln"
+    then
+        fail "$(printf "Unable to create directory %s\n" "$symln")"
+    fi
 fi
 
 if [[ "$version" == "next" ]]
 then
     printf "Installing Go %s\n" "$version"
-    which go>/dev/null || \
-        printf "Installing go from %s requires an existing go installation\n" "$golanggit" \
-        exit 1
+    if ! which go
+    then
+        fail "$(printf "Installing go from %s requires an existing go installation\n" "$golanggit")"
+    fi
 
     if [ ! -d "$srcd" ]; then
         printf "Cloning go source\n"
-        git clone "$golanggit" "$srcd" || \
-            printf "Error cloning %s" "$golanggit"; exit 1
+        if ! git clone "$golanggit" "$srcd"
+        then
+            fail "$("Error cloning %s\n" "$golanggit")"
+        fi
 
         # Add update flag since source repo
         # did not already exist
@@ -117,15 +135,25 @@ then
     then
         cd "$srcd" || exit 1
 
-        git checkout "$branch" || \
-            printf "Checkout of %s failed" "$branch"; exit 1
-        git pull || \
-            printf "git pull failed for %s" "$branch"; exit 1
+        if ! git checkout "$branch"
+        then
+            fail "$(printf "Checkout of %s failed\n" "$branch")"
+        fi
 
-        cd "$srcd/src/" || \
-            printf "Unable to move to %s" "$srcd/src/"; exit 1
-        ./all.bash || \
-            printf "Failure installing go from %s" "$branch"
+        if ! git pull
+        then
+            fail "$(printf "git pull failed for %s\n" "$branch")"
+        fi
+
+        if ! cd "$srcd/src/"
+        then
+            fail "$(printf "Unable to move to %s\n" "$srcd/src/")"
+        fi
+
+        if ! ./all.bash
+        then
+            fail "$(printf "Failure installing go from %s\n" "$branch")"
+        fi
 
         cd "$wd" || exit 1
     fi
@@ -136,17 +164,23 @@ else
     if [[ ! -d "$versionroot" ]]; then
         pkg="go$version.$os-$arch.tar.gz"
         url="$dlroot$pkg"
+        
         printf "Downloading %s\n" "$url"
-        curl -f "$url" > "$pkg" || \
-            printf "Unable to curl %s" "$url"
+        if ! curl -f "$url" > "$pkg"
+        then
+            fail "$(printf "Unable to curl %s\n" "$url")"
+        fi
 
-        printf "Making %s\n" "$versionroot"
-        rm -rf "$versionroot"
-        mkdir -p "$versionroot"
-        tar -C "$versionroot" -xzf "$pkg" || \
-            printf "Unable to extract %s" "$pkg" \
-            rm -rf "$versionroot" \
-            exit 1
+        printf "Creating %s\n" "$versionroot"
+        if ! mkdir -p "$versionroot"
+        then
+            fail "$(printf "Unable to create %s\n" "$versionroot")"
+        fi
+
+        if ! tar -C "$versionroot" -xzf "$pkg"
+        then
+            fail "$(printf "Unable to extract %s\n" "$pkg" rm -rf "$versionroot")"
+        fi
             
         rm "$pkg"
     fi
@@ -155,9 +189,11 @@ else
     lnsrc="$versionroot/go/bin"
 fi
 
-printf "Updating symlink %s => %s/bin\n" "$symln" "$lnsrc"
-ln -s "$lnsrc" "$symln" || \
-        printf "Unable to symlink directory %s" "$lnsrc"
+printf "Updating symlink %s => %s\n" "$symln" "$lnsrc"
+if ! ln -sF "$lnsrc" "$symln"
+then
+    fail "$(printf "Unable to symlink directory %s\n" "$lnsrc")"
+fi
 
 # Check to see if the default root exists and if it is a symlink
 # prior to prompting the user to override it
