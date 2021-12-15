@@ -2,18 +2,18 @@
 
 help() {
     printf "Go Version Manager
-    Usage: gvm <version> [<args>]\n
-      To install a released version
-      Example: gvm install 1.15.5\n
+    Usage: gvm <version> \n
+      To install or activate a released version
+      Example: gvm  1.17.5\n
 
-      To install the latest development
-      Example: gvm install next\n
+      To install or activate the development version
+      Example: gvm next\n
 
-      To update an existing development version
-      Example: gvm install next --update\n"
+      To update and activate an existing development version
+      Example: gvm next --update\n"
 }
 
-if [[ "$1" == ""  || "$1" == "-h" || "$1" == "--help" ]]
+if [[ "$1" == "" || "$1" ==  "help"  || "$1" == "-h" || "$1" == "--help" ]]
 then
     help
 
