@@ -229,7 +229,12 @@ then
         exec zsh
     else
         printf "%s" "$path" >> "$HOME/.bashrc"
-        exec bash
+        source "$HOME"/.bashrc
+
+        if uname -a | grep Ubuntu
+        then
+            printf "For ubuntu you must run [source ~/.bashrc] or logout/login to complete path installation/n"
+        fi
     fi
 fi
 
