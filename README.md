@@ -2,6 +2,7 @@
 
 Go Version Manager
 
+[![ShellCheck lint](https://github.com/devnw/gvm/actions/workflows/lint.yml/badge.svg)](https://github.com/devnw/gvm/actions/workflows/lint.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
