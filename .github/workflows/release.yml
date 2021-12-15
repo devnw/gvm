@@ -14,7 +14,6 @@ jobs:
         uses: actions/checkout@v2.4.0
       - name: Create Sum
         run: |
-          sed -i 's/SCRIPTVERSION="dev"/SCRIPTVERSION="$(git describe)"/' gvm
           shasum -a 256 ./gvm > gvm.sum
       - name: Create Release Tag
         uses: "marvinpinto/action-automatic-releases@latest"
