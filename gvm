@@ -3,7 +3,7 @@
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
 ###############################################################################
-SCRIPTVERSION="$(git describe --tags --always)"
+SCRIPTVERSION="dev"
 
 GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
 SUMPATH=$(printf "%s.sum" "$GVMURL")
@@ -19,7 +19,9 @@ then
     # Only trigger on `Y` or `y`
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
-        curl -sL "$GVMURL" -o "$0"
+        script=$(curl -sL "$GVMURL")
+        echo $script | shasum -a 256 -c -
+        printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
     fi
 fi
 
