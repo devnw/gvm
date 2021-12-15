@@ -1,6 +1,19 @@
 #!/bin/bash
 
+###############################################################################
+# GENERATED VERSION! DO NOT CHANGE!                                           #
+###############################################################################
 SCRIPTVERSION="$(git describe --tags --always)"
+
+
+SUMPATH=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm.sum" "$SCRIPTVERSION")
+EXPECTEDSUM=$(curl -s "$SUMPATH")
+
+if [[ "$EXPECTEDSUM" != "" && $(shasum -a 256 "$0") != "$EXPECTEDSUM" ]]
+then
+    echo "Checksum mismatch"
+    exit 1
+fi
 
 help() {
     printf "
