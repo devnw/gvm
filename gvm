@@ -2,7 +2,7 @@
 
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
-SCRIPTVERSION="dev"
+SCRIPTVERSION="$(git describe --tags --always)"
 ###############################################################################
 
 update() {
