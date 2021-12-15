@@ -77,7 +77,7 @@ function fail() {
 }
 
 arch="amd64"
-if ! uname -a | grep "x86_64"
+if ! uname -a | grep "x86_64"&> /dev/null
 then
     arch="arm64"
     printf "Configuring for %s Architecture\n" "$arch"
@@ -231,7 +231,7 @@ then
         printf "%s" "$path" >> "$HOME/.bashrc"
         source "$HOME"/.bashrc
 
-        if uname -a | grep Ubuntu
+        if uname -a | grep Ubuntu&> /dev/null
         then
             printf "For ubuntu you must run [source ~/.bashrc] or logout/login to complete path installation/n"
         fi
