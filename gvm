@@ -27,8 +27,10 @@ update() {
             if [[ "$yn" == "Y" || "$yn" == "y" ]]
             then
                 curl -sL "$GVMURL" > .gvm.tmp
-        
+                
                 # shellcheck disable=SC2002
+                DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
+                
                 if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
                 then
                     printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
