@@ -34,7 +34,7 @@ update() {
                     exit 1
                 fi
 
-                if ! mv .gvm.tmp "$0"
+                if ! cat .gvm.tmp > "$0"
                 then
                     printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
                     exit 1
