@@ -7,11 +7,11 @@ SCRIPTVERSION="$(git describe --tags --always)"
 
 
 SUMPATH=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm.sum" "$SCRIPTVERSION")
-EXPECTEDSUM=$(curl -s "$SUMPATH")
+EXPECTEDSUM=$(curl -L "$SUMPATH")
 
 if [[ "$EXPECTEDSUM" != "" && $(shasum -a 256 "$0") != "$EXPECTEDSUM" ]]
 then
-    echo "Checksum mismatch"
+    echo "Checksum mismatch; expected $EXPECTEDSUM, got $(shasum -a 256 "$0")"
     exit 1
 fi
 
