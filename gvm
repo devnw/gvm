@@ -22,8 +22,8 @@ update() {
         # Only trigger on `Y` or `y`
         if [[ "$yn" == "Y" || "$yn" == "y" ]]
         then
-            curl -sL "$GVMURL" > gvm.tmp
-            DOWNLOADEDSUM=$(cat gvm.tmp | shasum -a 256)
+            curl -sL "$GVMURL" > .gvm.tmp
+            DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
             if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
             then
                 printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
@@ -32,7 +32,7 @@ update() {
                 exit 1
             fi
 
-            if ! mv gvm.tmp "$0"
+            if ! mv .gvm.tmp "$0"
             then
                 printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
                 exit 1
