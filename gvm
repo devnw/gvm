@@ -113,33 +113,11 @@ gvmroot="$HOME/.gvm"
 srcd="$gvmroot/next"
 version="$1"
 versionroot="$gvmroot/$version"
-defaultgoroot="/usr/local/go"
+defaultgoroot="/usr/local/"
 golanggit="https://go.googlesource.com/go"
 dlroot="https://dl.google.com/go/"
 update=$2
 branch="master"
-
-function override() {
-    if [[ -d $defaultgoroot ]]
-    then
-        printf "Removing existing %s\n" "$defaultgoroot"
-        if ! sudo rm -rf $defaultgoroot
-        then
-            fail "$(printf "Unable to remove existing %s\n" "$defaultgoroot")"
-        fi
-    fi
-
-    printf "Creating for %s to %s\n" "$defaultgoroot" "$gvmroot"
-    if ! sudo mkdir -p $defaultgoroot
-    then
-        fail "$(printf "Unable to create new to symlink %s\n" "$defaultgoroot")"
-    fi
-
-    if ! sudo ln -sf "$gvmroot"/go "$defaultgoroot"
-    then
-        fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
-    fi
-}
 
 function fail() {
     printf "%s\n" "$1"
@@ -176,15 +154,6 @@ then
         fi
 fi
 
-# printf "Checking for existing %s\n" "$versionroot"
-# if [[ ! -d "$gvmroot" ]]
-# then
-#     if ! mkdir "$symln"
-#     then
-#         fail "$(printf "Unable to create directory %s\n" "$symln")"
-#     fi
-# fi
-
 if [[ "$version" == "next" ]]
 then
     printf "Installing Go %s\n" "$version"
@@ -198,15 +167,15 @@ then
         mkdir "$srcd"
     fi
 
-    if [[ ! -d "$srcd/go" ]]
+    srcd="$srcd/go"
+
+    if [[ ! -d "$srcd" ]]
     then
         printf "Cloning go source\n"
-        if ! git clone "$golanggit" "$srcd/go"
+        if ! git clone "$golanggit" "$srcd"
         then
             fail "$("Error cloning %s\n" "$golanggit")"
         fi
-
-        srcd=$srcd/go
 
         # Add update flag since source repo
         # did not already exist
@@ -245,9 +214,6 @@ then
 
         cd "$wd" || exit 1
     fi
-    
-    # Set correct path for symlink re-map
-    lnsrc="$versionroot"
 else
     if [[ ! -d "$versionroot" ]]
     then
@@ -273,10 +239,10 @@ else
             
         rm "$pkg"
     fi
-
-    # Set correct path for symlink re-map
-    lnsrc="$versionroot/go"
 fi
+
+# Set correct path for symlink re-map
+lnsrc="$versionroot/go"
 
 printf "Updating symlink %s => %s\n" "$lnsrc" "$gvmroot"
 if ! ln -sf "$lnsrc" "$gvmroot"
@@ -286,7 +252,7 @@ fi
 
 # Check to see if the default root exists and if it is a symlink
 # prior to prompting the user to override it
-if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]
+if [[ ! -L $defaultgoroot/go || ! -e $defaultgoroot/go ]]
 then
     read -rp "Do you wish to override /usr/local/go \
     [Yes: Y or y | No: Enter]? " yn
@@ -294,7 +260,10 @@ then
     # Only trigger on `Y` or `y`
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
-        override
+        if ! sudo ln -sf "$gvmroot/go" "$defaultgoroot"
+        then
+            fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
+        fi
     fi
 fi
 
@@ -321,7 +290,7 @@ then
     fi
 fi
 
-if which go
+if which go&> /dev/null
 then
     pathgo=$(which go)
     if [[ "$pathgo" != "$gvmroot/go/bin/go" ]]
