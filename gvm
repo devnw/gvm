@@ -25,8 +25,10 @@ then
     exit 0
 fi
 
-if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
-    if [[ "$1" != "next" ]]; then
+if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]
+then
+    if [[ "$1" != "next" ]]
+    then
         printf "%s is not a valid version\n" "$1"
 
         help
@@ -48,7 +50,8 @@ update=$2
 branch="master"
 
 function override() {
-    if [ -d $defaultgoroot ]; then
+    if [[ -d $defaultgoroot ]]
+    then
         printf "Removing existing %s\n" "$defaultgoroot"
         if ! sudo rm -rf $defaultgoroot
         then
@@ -95,7 +98,8 @@ else
     exit 1
 fi
 
-if [[ ! -d "$gvmroot" ]]; then
+if [[ ! -d "$gvmroot" ]]
+then
         printf "Adding ~/.gvm directory for go installs\n"
         if ! mkdir "$gvmroot" 
         then
@@ -104,7 +108,8 @@ if [[ ! -d "$gvmroot" ]]; then
 fi
 
 printf "Checking for existing %s\n" "$versionroot"
-if [[ ! -d "$symln" ]]; then
+if [[ ! -d "$symln" ]]
+then
     if ! mkdir "$symln"
     then
         fail "$(printf "Unable to create directory %s\n" "$symln")"
@@ -119,7 +124,8 @@ then
         fail "$(printf "Installing go from %s requires an existing go installation\n" "$golanggit")"
     fi
 
-    if [ ! -d "$srcd" ]; then
+    if [[ ! -d "$srcd" ]]
+    then
         printf "Cloning go source\n"
         if ! git clone "$golanggit" "$srcd"
         then
@@ -162,7 +168,8 @@ then
     # Set correct path for symlink re-map
     lnsrc="$versionroot/bin"
 else
-    if [[ ! -d "$versionroot" ]]; then
+    if [[ ! -d "$versionroot" ]]
+    then
         pkg="go$version.$os-$arch.tar.gz"
         url="$dlroot$pkg"
         
@@ -198,7 +205,8 @@ fi
 
 # Check to see if the default root exists and if it is a symlink
 # prior to prompting the user to override it
-if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]; then
+if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]
+then
     read -rp "Do you wish to override /usr/local/go \
     [Yes: Y or y | No: Enter]? " yn
 
@@ -209,12 +217,13 @@ if [[ ! -L $defaultgoroot/bin || ! -e $defaultgoroot/bin ]]; then
     fi
 fi
 
-if ! printf "%s" "$PATH" | grep -q "$symln/bin"; then
+if ! printf "%s" "$PATH" | grep -q "$symln/bin"
+then
     printf "Adding %s/bin to PATH\n" "$symln"
     
     path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$symln")
 
-    if [ "$SHELL" == "/bin/zsh" ]
+    if [[ "$SHELL" == "/bin/zsh" ]]
     then
         printf "%s" "$path" >> "$HOME/.zshrc"
         exec zsh
@@ -225,10 +234,9 @@ if ! printf "%s" "$PATH" | grep -q "$symln/bin"; then
 fi
 
 pathgo=$(which go)
-if [ "$pathgo" != "$symln/bin/go" ]
+if [[ "$pathgo" != "$symln/bin/go" ]]
 then
-    printf "GVM is shadowed by %s in your PATH. Please update your PATH to \
-    use %s/bin first\n" \
+    printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s/bin first\n" \
     "$pathgo" \
     "$symln"
 fi
