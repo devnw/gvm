@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.4.0
+      - name: Create Sum
+        run: |
+          shasum -a 256 ./gvm > gvm.sum
       - name: Create Pre-Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:

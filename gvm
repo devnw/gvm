@@ -1,7 +1,10 @@
 #!/bin/bash
 
+SCRIPTVERSION="$(git describe --tags --always)"
+
 help() {
-    printf "Go Version Manager
+    printf "
+    Go Version Manager [%s] \n
     Usage: gvm <version> \n
       To install or activate a released version
       Example: gvm  1.17.5\n
@@ -10,7 +13,7 @@ help() {
       Example: gvm next\n
 
       To update and activate an existing development version
-      Example: gvm next --update\n"
+      Example: gvm next --update\n" "$SCRIPTVERSION"
 }
 
 if [[ "$1" == "" || "$1" ==  "help"  || "$1" == "-h" || "$1" == "--help" ]]
@@ -41,7 +44,6 @@ wd=$(pwd)
 gvmroot="$HOME/.gvm"
 srcd="$gvmroot/next"
 version="$1"
-symln=$gvmroot/go
 versionroot="$gvmroot/$version"
 defaultgoroot="/usr/local/go"
 golanggit="https://go.googlesource.com/go"
@@ -59,13 +61,13 @@ function override() {
         fi
     fi
 
-    printf "Creating for %s to %s\n" "$defaultgoroot" "$symln"
+    printf "Creating for %s to %s\n" "$defaultgoroot" "$gvmroot"
     if ! sudo mkdir -p $defaultgoroot
     then
         fail "$(printf "Unable to create new to symlink %s\n" "$defaultgoroot")"
     fi
 
-    if ! sudo ln -sf "$symln"/bin "$defaultgoroot"
+    if ! sudo ln -sf "$gvmroot"/go "$defaultgoroot"
     then
         fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
     fi
@@ -83,7 +85,6 @@ then
     printf "Configuring for %s Architecture\n" "$arch"
 fi
     
-
 if [[ "$OSTYPE" == "darwin"* ]]
 then
     os="darwin"
@@ -107,14 +108,14 @@ then
         fi
 fi
 
-printf "Checking for existing %s\n" "$versionroot"
-if [[ ! -d "$symln" ]]
-then
-    if ! mkdir "$symln"
-    then
-        fail "$(printf "Unable to create directory %s\n" "$symln")"
-    fi
-fi
+# printf "Checking for existing %s\n" "$versionroot"
+# if [[ ! -d "$gvmroot" ]]
+# then
+#     if ! mkdir "$symln"
+#     then
+#         fail "$(printf "Unable to create directory %s\n" "$symln")"
+#     fi
+# fi
 
 if [[ "$version" == "next" ]]
 then
@@ -158,15 +159,20 @@ then
 
         if ! ./all.bash
         then
-            cd "$wd" || exit 1
-            fail "$(printf "Failure installing go from %s\n" "$branch")"
+
+            # Only fail if the go binary wasn't properly built
+            if ! ./bin/go version
+            then
+                cd "$wd" || exit 1
+                fail "$(printf "Failure installing go from %s\n" "$branch")"
+            fi
         fi
 
         cd "$wd" || exit 1
     fi
     
     # Set correct path for symlink re-map
-    lnsrc="$versionroot/bin"
+    lnsrc="$versionroot"
 else
     if [[ ! -d "$versionroot" ]]
     then
@@ -194,11 +200,11 @@ else
     fi
 
     # Set correct path for symlink re-map
-    lnsrc="$versionroot/go/bin"
+    lnsrc="$versionroot/go"
 fi
 
-printf "Updating symlink %s => %s\n" "$symln" "$lnsrc"
-if ! ln -sf "$lnsrc" "$symln"
+printf "Updating symlink %s => %s\n" "$gvmroot" "$lnsrc"
+if ! ln -sf "$lnsrc" "$gvmroot"
 then
     fail "$(printf "Unable to symlink directory %s\n" "$lnsrc")"
 fi
@@ -217,11 +223,11 @@ then
     fi
 fi
 
-if ! printf "%s" "$PATH" | grep -q "$symln/bin"
+if ! printf "%s" "$PATH" | grep -q "$gvmroot/go/bin"
 then
-    printf "Adding %s/bin to PATH\n" "$symln"
+    printf "Adding %s/bin to PATH\n" "$gvmroot/go"
     
-    path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$symln")
+    path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$gvmroot/go")
 
     if [[ "$SHELL" == *"zsh" ]]
     then
@@ -243,10 +249,10 @@ fi
 if which go
 then
     pathgo=$(which go)
-    if [[ "$pathgo" != "$symln/bin/go" ]]
+    if [[ "$pathgo" != "$gvmroot/go/bin/go" ]]
     then
         printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s first\n" \
         "$pathgo" \
-        "$symln"
+        "$gvmroot/go/bin"
     fi
 fi
