@@ -10,6 +10,8 @@ update() {
     GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
     SUMPATH=$(printf "%s.sum" "$GVMURL")
     EXPECTEDSUM=$(curl -sL "$SUMPATH")
+   
+    # shellcheck disable=SC2086
     FILESUM=$(cat $0 | shasum -a 256)
 
     if [[ "$EXPECTEDSUM" != "Not Found" ]]
@@ -25,7 +27,8 @@ update() {
             if [[ "$yn" == "Y" || "$yn" == "y" ]]
             then
                 curl -sL "$GVMURL" > .gvm.tmp
-                DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
+        
+                # shellcheck disable=SC2002
                 if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
                 then
                     printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
@@ -41,7 +44,7 @@ update() {
                 fi
 
                 printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
-                exec "$@"
+                exec $@
             fi
         fi
     fi
