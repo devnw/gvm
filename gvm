@@ -5,14 +5,22 @@
 ###############################################################################
 SCRIPTVERSION="$(git describe --tags --always)"
 
-
-SUMPATH=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm.sum" "$SCRIPTVERSION")
-EXPECTEDSUM=$(curl -L "$SUMPATH")
+GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
+SUMPATH=$(printf "%s.sum" "$GVMURL")
+EXPECTEDSUM=$(curl -sL "$SUMPATH")
 
 if [[ "$EXPECTEDSUM" != "" && $(shasum -a 256 "$0") != "$EXPECTEDSUM" ]]
 then
-    echo "Checksum mismatch; expected $EXPECTEDSUM, got $(shasum -a 256 "$0")"
-    exit 1
+
+    printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
+
+    read -rp "[Yes: Y or y | No: Enter]? " yn
+
+    # Only trigger on `Y` or `y`
+    if [[ "$yn" == "Y" || "$yn" == "y" ]]
+    then
+        curl -sL "$GVMURL" -o "$0"
+    fi
 fi
 
 help() {
