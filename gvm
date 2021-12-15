@@ -46,9 +46,11 @@ update() {
 
                 if ! cat .gvm.tmp > "$0"
                 then
+                    rm .gvm.tmp
                     printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
                     exit 1
                 fi
+                rm .gvm.tmp
 
                 printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
                 printf "%s\n" "$@"
