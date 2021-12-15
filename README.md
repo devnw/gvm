@@ -11,8 +11,16 @@ Go Version Manager
 To use the command below directly ensure that $HOME/bin is in your PATH.
 
 ```bash
-curl -L https://github.com/devnw/gvm/releases/download/latest/gvm > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
+curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
+    > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
 ```
+
+## Updating gvm
+
+`gvm` will automatically detect if there is a newer version available for the
+installed `gvm` tag and give the user the option to update. If the user chooses
+to update, the `gvm` command will be updated to the latest version and re-run
+the updated script instead.
 
 ## Usage
 
