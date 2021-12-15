@@ -12,8 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.4.0
-      - name: Create Sum
+      - name: Create Tag Sum
         run: |
+          ./version
           shasum -a 256 ./gvm > gvm.sum
       - name: Create Release Tag
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -24,6 +25,10 @@ jobs:
             LICENSE
             gvm
             gvm.sum
+      - name: Create Latest Sum
+        run: |
+          ./version latest
+          shasum -a 256 ./gvm > gvm.sum
       - name: Create Latest Tag
         uses: "marvinpinto/action-automatic-releases@latest"
         with:

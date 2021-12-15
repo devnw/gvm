@@ -1,7 +1,13 @@
 #!/bin/bash
 
+version=$(git describe --tags --always)
+if [[ $1 != "" ]]
+then
+    version=$1
+fi
+
 # shellcheck disable=SC2016
 searchstring=$(printf 'SCRIPTVERSION="$(git describe --tags --always)"')
-replstring=$(printf 'SCRIPTVERSION="%s"' "$(git describe --tags --always)")
+replstring=$(printf 'SCRIPTVERSION="%s"' "$version")
 sedcmd=$(printf "s/%s/%s/" "$searchstring" "$replstring")
-sed -i "$sedcmd" ./gvm
+gsed -i "$sedcmd" ./gvm

@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v2.4.0
       - name: Create Sum
         run: |
+          ./version dev
           shasum -a 256 ./gvm > gvm.sum
       - name: Create Pre-Release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -26,3 +27,4 @@ jobs:
           files: |
             LICENSE
             gvm
+            gvm.sum
