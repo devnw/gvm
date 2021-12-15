@@ -2,46 +2,37 @@
 
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
-SCRIPTVERSION="$(git describe --tags --always)"
 ###############################################################################
+SCRIPTVERSION="dev"
 
-update() {
+GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
+SUMPATH=$(printf "%s.sum" "$GVMURL")
+EXPECTEDSUM=$(curl -sL "$SUMPATH")
+FILESUM=$(cat $0 | shasum -a 256)
 
-    GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
-    SUMPATH=$(printf "%s.sum" "$GVMURL")
-    EXPECTEDSUM=$(curl -sL "$SUMPATH")
-    FILESUM=$(cat $0 | shasum -a 256)
+if [[ "$EXPECTEDSUM" != "" && $FILESUM != "$EXPECTEDSUM" ]]
+then
 
-    if [[ "$EXPECTEDSUM" != "" && $FILESUM != "$EXPECTEDSUM" ]]
+    printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
+
+    read -rp "[Yes: Y or y | No: Enter]? " yn
+
+    # Only trigger on `Y` or `y`
+    if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
-
-        printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
-
-        read -rp "[Yes: Y or y | No: Enter]? " yn
-
-        # Only trigger on `Y` or `y`
-        if [[ "$yn" == "Y" || "$yn" == "y" ]]
+        script=$(curl -sL "$GVMURL")
+        DOWNLOADEDSUM=$(echo "$script" | shasum -a 256)
+        if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
         then
-            curl -sL "$GVMURL" > gvm.tmp
-            DOWNLOADEDSUM=$(cat gvm.tmp | shasum -a 256)
-            if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
-            then
-                printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
-                printf "Expected: %s\n" "$EXPECTEDSUM"
-                printf "Actual:   %s\n" "$DOWNLOADEDSUM"
-                exit 1
-            fi
-
-            if ! mv gvm.tmp "$0"
-            then
-                printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
-                exit 1
-            fi
-
-            printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
+            printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
+            printf "Expected: %s\n" "$EXPECTEDSUM"
+            printf "Actual:   %s\n" "$DOWNLOADEDSUM"
+            exit 1
         fi
+
+        printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
     fi
-}
+fi
 
 help() {
     printf "
@@ -56,9 +47,6 @@ help() {
       To update and activate an existing development version
       Example: gvm next --update\n" "$SCRIPTVERSION"
 }
-
-# Determine if the script is out of date and offer to update
-update
 
 if [[ "$1" == "" || "$1" ==  "help"  || "$1" == "-h" || "$1" == "--help" ]]
 then
