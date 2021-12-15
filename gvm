@@ -46,7 +46,7 @@ update() {
                 fi
 
                 printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
-                exec $@
+                exec "$@"
             fi
         fi
     fi
