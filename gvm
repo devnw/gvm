@@ -229,7 +229,7 @@ then
         then
 
             # Only fail if the go binary wasn't properly built
-            if ! ./bin/go version
+            if ! ../bin/go version
             then
                 cd "$wd" || exit 1
                 fail "$(printf "Failure installing go from %s\n" "$branch")"
