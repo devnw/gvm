@@ -20,9 +20,11 @@ then
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
         script=$(curl -sL "$GVMURL")
-        if [[ $(echo "$script" | shasum -a 256) != "$EXPECTEDSUM" ]]
+        DOWNLOADEDSUM=$(echo "$script" | shasum -a 256)
+        if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
         then
             printf "Checksum does not match new version of GVM [%s]" "$SCRIPTVERSION"
+            printf "Expected: %s" "$EXPECTEDSUM; Actual: $(echo "$script" | shasum -a 256)"
             exit 1
         fi
 
