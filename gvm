@@ -152,6 +152,7 @@ then
 
         if ! ./all.bash
         then
+            cd "$wd" || exit 1
             fail "$(printf "Failure installing go from %s\n" "$branch")"
         fi
 
