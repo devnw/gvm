@@ -15,7 +15,7 @@ jobs:
       - name: Create Tag Sum
         run: |
           ./version
-          shasum -a 256 ./gvm > gvm.sum
+          cat ./gvm | shasum -a 256 > gvm.sum
       - name: Create Release Tag
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -28,7 +28,7 @@ jobs:
       - name: Create Latest Sum
         run: |
           ./version latest
-          shasum -a 256 ./gvm > gvm.sum
+          cat ./gvm | shasum -a 256 > gvm.sum
       - name: Create Latest Tag
         uses: "marvinpinto/action-automatic-releases@latest"
         with:

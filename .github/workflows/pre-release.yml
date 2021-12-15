@@ -16,7 +16,7 @@ jobs:
       - name: Create Sum
         run: |
           ./version dev
-          shasum -a 256 ./gvm > gvm.sum
+          cat ./gvm | shasum -a 256 > gvm.sum
       - name: Create Pre-Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:

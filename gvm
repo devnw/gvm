@@ -3,7 +3,7 @@
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
 ###############################################################################
-SCRIPTVERSION="dev"
+SCRIPTVERSION="$(git describe --tags --always)"
 
 GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
 SUMPATH=$(printf "%s.sum" "$GVMURL")
@@ -20,9 +20,9 @@ then
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
         script=$(curl -sL "$GVMURL")
-        if [[ $(echo $script | shasum -a 256) != "$EXPECTEDSUM" ]]
+        if [[ $(echo "$script" | shasum -a 256) != "$EXPECTEDSUM" ]]
         then
-            echo "Checksum does not match new version of GVM [%s]" "$SCRIPTVERSION"
+            printf "Checksum does not match new version of GVM [%s]" "$SCRIPTVERSION"
             exit 1
         fi
 
