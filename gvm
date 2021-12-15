@@ -223,7 +223,7 @@ then
     
     path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$symln")
 
-    if [[ "$SHELL" == "/bin/zsh" ]]
+    if [[ "$SHELL" == *"zsh" ]]
     then
         printf "%s" "$path" >> "$HOME/.zshrc"
         exec zsh
