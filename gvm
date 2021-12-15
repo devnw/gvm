@@ -195,11 +195,18 @@ then
 
     if [[ ! -d "$srcd" ]]
     then
+        mkdir "$srcd"
+    fi
+
+    if [[ ! -d "$srcd/go" ]]
+    then
         printf "Cloning go source\n"
-        if ! git clone "$golanggit" "$srcd"
+        if ! git clone "$golanggit" "$srcd/go"
         then
             fail "$("Error cloning %s\n" "$golanggit")"
         fi
+
+        srcd=$srcd/go
 
         # Add update flag since source repo
         # did not already exist
@@ -271,7 +278,7 @@ else
     lnsrc="$versionroot/go"
 fi
 
-printf "Updating symlink %s => %s\n" "$gvmroot" "$lnsrc"
+printf "Updating symlink %s => %s\n" "$lnsrc" "$gvmroot"
 if ! ln -sf "$lnsrc" "$gvmroot"
 then
     fail "$(printf "Unable to symlink directory %s\n" "$lnsrc")"
