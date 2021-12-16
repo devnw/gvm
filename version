@@ -10,6 +10,11 @@ fi
 SED=sed
 if [[ "$OSTYPE" == "darwin"* ]]
 then
+    if ! which gsed&> /dev/null
+    then
+        printf "gsed is required for MacOS\n"
+        exit 1
+    fi
     SED=gsed
 fi
 
