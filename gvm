@@ -2,7 +2,7 @@
 
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
-SCRIPTVERSION="$(git describe --tags --always)"
+SCRIPTVERSION="local-dev"
 ###############################################################################
 
 # Update checks the published version of this script based on the SCRIPTVERSION
@@ -12,56 +12,59 @@ SCRIPTVERSION="$(git describe --tags --always)"
 # version.
 update() {
 
-    GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
-    SUMPATH=$(printf "%s.sum" "$GVMURL")
-    EXPECTEDSUM=$(curl -sL "$SUMPATH")
-   
-    # shellcheck disable=SC2086
-    FILESUM=$(cat $0 | shasum -a 256)
-
-    if [[ "$EXPECTEDSUM" != "Not Found" ]]
+    if [[ $SCRIPTVERSION != "local-dev" ]]
     then
-        if [[ "$EXPECTEDSUM" != "" && $FILESUM != "$EXPECTEDSUM" ]]
+        GVMURL=$(printf "https://github.com/devnw/gvm/releases/download/%s/gvm" "$SCRIPTVERSION")
+        SUMPATH=$(printf "%s.sum" "$GVMURL")
+        EXPECTEDSUM=$(curl -sL "$SUMPATH")
+    
+        # shellcheck disable=SC2086
+        FILESUM=$(cat $0 | shasum -a 256)
+
+        if [[ "$EXPECTEDSUM" != "Not Found" ]]
         then
-
-            printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
-
-            read -rp "[Yes: Y or y | No: Enter]? " yn
-
-            # Only trigger on `Y` or `y`
-            if [[ "$yn" == "Y" || "$yn" == "y" ]]
+            if [[ "$EXPECTEDSUM" != "" && $FILESUM != "$EXPECTEDSUM" ]]
             then
-                curl -sL "$GVMURL" > .gvm.tmp
-                
-                # shellcheck disable=SC2002
-                DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
-                
-                if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
-                then
-                    printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
-                    printf "Expected: %s\n" "$EXPECTEDSUM"
-                    printf "Actual:   %s\n" "$DOWNLOADEDSUM"
-                    exit 1
-                fi
 
-                if ! cat .gvm.tmp > "$0"
+                printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
+
+                read -rp "[Yes: Y or y | No: Enter]? " yn
+
+                # Only trigger on `Y` or `y`
+                if [[ "$yn" == "Y" || "$yn" == "y" ]]
                 then
+                    curl -sL "$GVMURL" > .gvm.tmp
+                    
+                    # shellcheck disable=SC2002
+                    DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
+                    
+                    if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
+                    then
+                        printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
+                        printf "Expected: %s\n" "$EXPECTEDSUM"
+                        printf "Actual:   %s\n" "$DOWNLOADEDSUM"
+                        exit 1
+                    fi
+
+                    if ! cat .gvm.tmp > "$0"
+                    then
+                        rm .gvm.tmp
+                        printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
+                        exit 1
+                    fi
                     rm .gvm.tmp
-                    printf "Failed to move new version of GVM [%s]\n" "$SCRIPTVERSION"
-                    exit 1
-                fi
-                rm .gvm.tmp
 
-                printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
-                printf "%s\n" "$@"
-                if ! exec $0 "$@"
-                then 
-                    printf "Failed to execute new version of GVM [%s]\n" "$SCRIPTVERSION"
-                    exit 1
-                fi
+                    printf "GVM [%s] has been updated\n" "$SCRIPTVERSION"
+                    printf "%s\n" "$@"
+                    if ! exec $0 "$@"
+                    then 
+                        printf "Failed to execute new version of GVM [%s]\n" "$SCRIPTVERSION"
+                        exit 1
+                    fi
 
-                printf "Successful update and execution"
-                exit 0
+                    printf "Successful update and execution"
+                    exit 0
+                fi
             fi
         fi
     fi
@@ -110,6 +113,8 @@ fi
 
 wd=$(pwd)
 gvmroot="$HOME/.gvm"
+gvmbin="$gvmroot/go/bin"
+gvmexe="$gvmbin/go"
 srcd="$gvmroot/next"
 version="$1"
 versionroot="$gvmroot/$version"
@@ -267,11 +272,11 @@ then
     fi
 fi
 
-if ! printf "%s" "$PATH" | grep -q "$gvmroot/go/bin"
+if ! printf "%s" "$PATH" | grep -q "$gvmbin"
 then
-    printf "Adding %s/bin to PATH\n" "$gvmroot/go"
+    printf "Adding %s/bin to PATH\n" "$gvmbin"
     
-    path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$gvmroot/go")
+    path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$gvmbin")
 
     if [[ "$SHELL" == *"zsh" ]]
     then
@@ -293,10 +298,10 @@ fi
 if which go&> /dev/null
 then
     pathgo=$(which go)
-    if [[ "$pathgo" != "$gvmroot/go/bin/go" ]]
+    if [[ "$pathgo" != "$gvmexe" ]]
     then
         printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s first\n" \
         "$pathgo" \
-        "$gvmroot/go/bin"
+        "$gvmbin"
     fi
 fi
