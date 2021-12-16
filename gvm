@@ -274,9 +274,9 @@ fi
 
 if ! printf "%s" "$PATH" | grep -q "$gvmbin"
 then
-    printf "Adding %s/bin to PATH\n" "$gvmbin"
+    printf "Adding %s to PATH\n" "$gvmbin"
     
-    path=$(printf "export PATH=\"%s/bin:\$PATH\"" "$gvmbin")
+    path=$(printf "export PATH=\"%s:\$PATH\"" "$gvmbin")
 
     if [[ "$SHELL" == *"zsh" ]]
     then
