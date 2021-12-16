@@ -5,6 +5,41 @@
 SCRIPTVERSION="local-dev"
 ###############################################################################
 
+# Static variable definintions
+wd=$(pwd)
+gvmroot="$HOME/.gvm"
+gvmbin="$gvmroot/go/bin"
+gvmexe="$gvmbin/go"
+srcd="$gvmroot/next"
+version="$1"
+versionroot="$gvmroot/$version"
+defaultgoroot="/usr/local/"
+golanggit="https://go.googlesource.com/go"
+dlroot="https://dl.google.com/go/"
+update=$2
+branch="master"
+
+# Print the help text for gvm
+help() {
+    printf "
+    Go Version Manager [%s] \n
+    Usage: gvm <version> \n
+      To install or activate a released version
+      Example: gvm  1.17.5\n
+
+      To install or activate the development version
+      Example: gvm next\n
+
+      To update and activate an existing development version
+      Example: gvm next --update\n" "$SCRIPTVERSION"
+}
+
+# fail accepts a string argument, prints it and exits with a non-zero exit code
+function fail() {
+    printf "%s\n" "$1"
+    exit 1
+}
+
 # Update checks the published version of this script based on the SCRIPTVERSION
 # variable. If the version is different, it will give the user the option to
 # update the script. If the user chooses to update, it will download the new
@@ -70,20 +105,6 @@ update() {
     fi
 }
 
-help() {
-    printf "
-    Go Version Manager [%s] \n
-    Usage: gvm <version> \n
-      To install or activate a released version
-      Example: gvm  1.17.5\n
-
-      To install or activate the development version
-      Example: gvm next\n
-
-      To update and activate an existing development version
-      Example: gvm next --update\n" "$SCRIPTVERSION"
-}
-
 # Determine if the script is out of date and offer to update
 update "$@"
 
@@ -103,31 +124,13 @@ if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.|[1-9][0-9]*)(((0|[1-9][0-9]*|
 then
     if [[ "$1" != "next" ]]
     then
-        printf "%s is not a valid version\n" "$1"
+        printf "%s is not a valid Go version\n" "$1"
 
         help
 
         exit 1
     fi
 fi
-
-wd=$(pwd)
-gvmroot="$HOME/.gvm"
-gvmbin="$gvmroot/go/bin"
-gvmexe="$gvmbin/go"
-srcd="$gvmroot/next"
-version="$1"
-versionroot="$gvmroot/$version"
-defaultgoroot="/usr/local/"
-golanggit="https://go.googlesource.com/go"
-dlroot="https://dl.google.com/go/"
-update=$2
-branch="master"
-
-function fail() {
-    printf "%s\n" "$1"
-    exit 1
-}
 
 arch="amd64"
 if ! uname -a | grep "x86_64"&> /dev/null
@@ -225,6 +228,11 @@ else
         pkg="go$version.$os-$arch.tar.gz"
         url="$dlroot$pkg"
         
+        if ! curl -fsL --head "$url"&> /dev/null
+        then
+            fail "$(printf "Go Version Download %s does not exist" "$version")"
+        fi
+
         printf "Downloading %s\n" "$url"
         if ! curl -f "$url" > "$pkg"
         then
