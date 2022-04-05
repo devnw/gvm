@@ -62,7 +62,6 @@ installed() {
 
     for dir in "$gvmroot"/*
     do
-
         dir=${dir%*/}
         trimmed=${dir##*/}
 
@@ -94,8 +93,6 @@ alwaysUpdateQ() {
     printf "Would you like to always update? "
 
     read -rp "[Yes: Y or y | No: Enter]? " yn
-
-    # Only trigger on `Y` or `y`
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
         echo "alwaysUpdate=true" >> "$gvmroot/.config"
@@ -319,6 +316,7 @@ else
     then
         pkg="go$version.$os-$arch.tar.gz"
         url="$dlroot$pkg"
+        pkgDir="$gvmroot/$pkg"
         
         if ! curl -fsL --head "$url"&> /dev/null
         then
@@ -326,7 +324,7 @@ else
         fi
 
         printf "Downloading %s\n" "$url"
-        if ! curl -f "$url" > "$pkg"
+        if ! curl -f "$url" > "$pkgDir"
         then
             fail "$(printf "Unable to curl %s\n" "$url")"
         fi
@@ -337,12 +335,12 @@ else
             fail "$(printf "Unable to create %s\n" "$versionroot")"
         fi
 
-        if ! tar -C "$versionroot" -xzf "$pkg"
+        if ! tar -C "$versionroot" -xzf "$pkgDir"
         then
-            fail "$(printf "Unable to extract %s\n" "$pkg" rm -rf "$versionroot")"
+            fail "$(printf "Unable to extract %s\n" "$pkgDir" rm -rf "$versionroot")"
         fi
             
-        rm "$pkg"
+        rm "$pkgDir"
     fi
 fi
 
