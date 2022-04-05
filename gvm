@@ -95,6 +95,8 @@ alwaysUpdateQ() {
     read -rp "[Yes: Y or y | No: Enter]? " yn
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
+        # set the auto update variable to true
+        alwaysUpdate=true
         grep "alwaysUpdate=true"&> /dev/null < "$gvmroot/.config"
         if [[ $? == 1 ]]
         then
