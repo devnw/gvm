@@ -19,6 +19,11 @@ dlroot="https://dl.google.com/go/"
 update=$2
 branch="master"
 
+# Persistent Configuration Values
+override=true
+
+
+
 # Determine active symlink version
 active=$(readlink -f "$gvmroot"/go)
 active=${active%*/go}
@@ -72,6 +77,16 @@ installed() {
             printf "\n"
         fi
     done
+}
+
+loadConfig() {
+    cfg="$gvmroot/.config"
+
+    if [[ -f "$cfg" ]]
+    then
+        # shellcheck disable=SC1090
+        source "$cfg"
+    fi
 }
 
 # fail accepts a string argument, prints it and exits with a non-zero exit code
@@ -159,6 +174,8 @@ then
 
     exit 0
 fi
+
+loadConfig
 
 if [[ "$1" == "ls" ]]
 then
@@ -316,21 +333,26 @@ then
     fail "$(printf "Unable to symlink directory %s\n" "$lnsrc")"
 fi
 
-# Check to see if the default root exists and if it is a symlink
-# prior to prompting the user to override it
-if [[ ! -L $defaultgoroot/go || ! -e $defaultgoroot/go ]]
+if [[ $override == true ]]
 then
-    read -rp "Do you wish to override /usr/local/go \
-    [Yes: Y or y | No: Enter]? " yn
-
-    # Only trigger on `Y` or `y`
-    if [[ "$yn" == "Y" || "$yn" == "y" ]]
+    # Check to see if the default root exists and if it is a symlink
+    # prior to prompting the user to override it
+    if [[ ! -L $defaultgoroot/go || ! -e $defaultgoroot/go ]]
     then
-        if ! sudo ln -sf "$gvmroot/go" "$defaultgoroot"
+        read -rp "Do you wish to override /usr/local/go \
+        [Yes: Y or y | No: Enter]? " yn
+
+        # Only trigger on `Y` or `y`
+        if [[ "$yn" == "Y" || "$yn" == "y" ]]
         then
-            fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
+            if ! sudo ln -sf "$gvmroot/go" "$defaultgoroot"
+            then
+                fail "$(printf "Unable to symlink new %s\n" "$defaultgoroot")"
+            fi
         fi
     fi
+
+    echo "override=false" >> "$gvmroot/.config"
 fi
 
 if ! printf "%s" "$PATH" | grep -q "$gvmbin"
