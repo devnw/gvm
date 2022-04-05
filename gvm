@@ -133,7 +133,7 @@ then
 fi
 
 arch="amd64"
-if ! uname -a | grep "x86_64"&> /dev/null
+if uname -a | grep "arm64"&> /dev/null
 then
     arch="arm64"
     printf "Configuring for %s Architecture\n" "$arch"

@@ -27,6 +27,7 @@ jobs:
             gvm.sum
       - name: Create Latest Sum
         run: |
+          git reset --hard
           ./version latest
           cat ./gvm | shasum -a 256 > gvm.sum
       - name: Create Latest Tag
