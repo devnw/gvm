@@ -54,8 +54,6 @@ installed() {
     echo "${bold}Installed Go Versions"
     echo "---------------------${normal}"
 
-    echo "Active: $active"
-
     for dir in "$gvmroot"/*
     do
 
