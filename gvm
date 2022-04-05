@@ -95,12 +95,10 @@ alwaysUpdateQ() {
     read -rp "[Yes: Y or y | No: Enter]? " yn
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
-        grep alwaysUpdate&> /dev/null < "$gvmroot/.config"
+        grep "alwaysUpdate=true"&> /dev/null < "$gvmroot/.config"
         if [[ $? == 1 ]]
         then
-            sed -i "s/alwaysUpdate=false/alwaysUpdate=true/" "$gvmroot/.config"
-        else
-            printf "alwaysUpdate=true\n" >> "$gvmroot/.config"
+           printf "alwaysUpdate=true\n" >> "$gvmroot/.config"
         fi
     fi
 }
