@@ -33,6 +33,18 @@ active=${active##*/}
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+loadConfig() {
+    cfg="$gvmroot/.config"
+
+    if [[ -f "$cfg" ]]
+    then
+        # shellcheck disable=SC1090
+        source "$cfg"
+    fi
+}
+
+loadConfig
+
 # Print the help text for gvm
 help() {
     printf "
@@ -79,16 +91,6 @@ installed() {
     done
 }
 
-loadConfig() {
-    cfg="$gvmroot/.config"
-
-    if [[ -f "$cfg" ]]
-    then
-        # shellcheck disable=SC1090
-        source "$cfg"
-    fi
-}
-
 alwaysUpdateQ() {
     printf "Would you like to always update? "
 
@@ -96,7 +98,6 @@ alwaysUpdateQ() {
     if [[ "$yn" == "Y" || "$yn" == "y" ]]
     then
         # set the auto update variable to true
-        alwaysUpdate=true
         grep "alwaysUpdate=true"&> /dev/null < "$gvmroot/.config"
         if [[ $? == 1 ]]
         then
@@ -199,8 +200,6 @@ then
 
     exit 0
 fi
-
-loadConfig
 
 if [[ "$1" == "ls" ]]
 then
