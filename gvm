@@ -19,19 +19,61 @@ dlroot="https://dl.google.com/go/"
 update=$2
 branch="master"
 
+# Determine active symlink version
+active=$(readlink -f "$gvmroot"/go)
+active=${active%*/go}
+active=${active##*/}
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+
 # Print the help text for gvm
 help() {
     printf "
-    Go Version Manager [%s] \n
-    Usage: gvm <version> \n
-      To install or activate a released version
-      Example: gvm  1.17.5\n
+    Go Version Manager [${bold}%s${normal}] \n
+    Usage:\n
+        ${bold}gvm <command> [arguments]${normal}
 
+    The commands are:
+        ${bold}<go version>${normal}  Install or Change Specific Go Version
+        ${bold}ls${normal}            List Installed Go Versions
+    
+    ${bold}Examples:${normal}
+      To install or activate a released version
+      ${bold}gvm  1.17.5${normal}
+
+    ${bold}DEVELOPMENT VERSION:${normal}
       To install or activate the development version
-      Example: gvm next\n
+      ${bold}gvm next${normal}
 
       To update and activate an existing development version
-      Example: gvm next --update\n" "$SCRIPTVERSION"
+      ${bold}gvm next --update${normal}\n" "$SCRIPTVERSION"
+}
+
+installed() {
+    echo "${bold}Installed Go Versions"
+    echo "---------------------${normal}"
+
+    echo "Active: $active"
+
+    for dir in "$gvmroot"/*
+    do
+
+        dir=${dir%*/}
+        trimmed=${dir##*/}
+
+        if [[ $trimmed != "go" ]]
+        then
+            printf "%s" "$trimmed"
+
+            if [[ "$active" == "$trimmed" ]]
+            then
+                printf "%s*%s" "${bold}" "${normal}"
+            fi
+
+            printf "\n"
+        fi
+    done
 }
 
 # fail accepts a string argument, prints it and exits with a non-zero exit code
@@ -120,6 +162,13 @@ then
     exit 0
 fi
 
+if [[ "$1" == "ls" ]]
+then
+    installed
+
+    exit 0
+fi
+
 if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.|[1-9][0-9]*)(((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?$ ]]
 then
     if [[ "$1" != "next" ]]
@@ -130,6 +179,12 @@ then
 
         exit 1
     fi
+fi
+
+if [[ "$active" == "$1" ]]
+then
+    printf "Go version ${bold}%s${normal} is already active\n" "$1"
+    exit 0
 fi
 
 arch="amd64"
