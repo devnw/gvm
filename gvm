@@ -105,7 +105,7 @@ alwaysUpdateQ() {
     fi
 }
 
-update() {
+upgrade() {
     curl -sL "$GVMURL" > .gvm.tmp
                     
     # shellcheck disable=SC2002
@@ -167,7 +167,7 @@ update() {
             then
                 if [[ $alwaysUpdate == true ]]
                 then
-                    update
+                    upgrade "$@"
                 else
                     printf "New Version of GVM [%s] Available would you like to update? " "$SCRIPTVERSION"
 
@@ -177,7 +177,7 @@ update() {
                     if [[ "$yn" == "Y" || "$yn" == "y" ]]
                     then
                         alwaysUpdateQ
-                        update
+                        upgrade "$@"
                     fi
                 fi
             fi
