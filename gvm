@@ -18,12 +18,11 @@ golanggit="https://go.googlesource.com/go"
 dlroot="https://dl.google.com/go/"
 update=$2
 branch="master"
+remove=false
 
 # Persistent Configuration Values
 override=true
 alwaysUpdate=false
-
-
 
 # Determine active symlink version
 active=$(readlink -f "$gvmroot"/go)
@@ -54,11 +53,16 @@ help() {
 
     The commands are:
         ${bold}<go version>${normal}  Install or Change Specific Go Version
+            ${bold}-s${normal} Silent Mode (No Prompts)
+            ${bold}-r${normal} Remove Go Version
         ${bold}ls${normal}            List Installed Go Versions
     
     ${bold}Examples:${normal}
       To install or activate a released version
       ${bold}gvm  1.17.5${normal}
+
+      To remove a version
+      ${bold}gvm  1.17.5 -r${normal}
 
     ${bold}DEVELOPMENT VERSION:${normal}
       To install or activate the development version
@@ -90,6 +94,44 @@ installed() {
         fi
     done
 }
+
+for flag in "$@"
+do
+    case $flag in
+    -s)
+        override=false
+        alwaysUpdate=true
+        ;;
+    help)
+        help
+        exit 0
+        ;;
+    --help)
+        help
+        exit 0
+        ;;
+    -h)
+        help
+        exit 0
+        ;;
+    ls)
+        installed
+        exit 0
+        ;;
+    -r)
+        remove=true
+        ;;
+    *);;
+    esac
+done
+
+
+if [[ $1 == "" ]]
+then
+    echo "No command specified"
+    help
+    exit 1
+fi
 
 alwaysUpdateQ() {
     printf "Would you like to always update? "
@@ -189,25 +231,6 @@ update() {
 # Determine if the script is out of date and offer to update
 update "$@"
 
-if [[ "$1" == "" || "$1" ==  "help"  || "$1" == "-h" || "$1" == "--help" ]]
-then
-    help
-
-    if [[ "$1" == ""  ]]
-    then
-        exit 1
-    fi
-
-    exit 0
-fi
-
-if [[ "$1" == "ls" ]]
-then
-    installed
-
-    exit 0
-fi
-
 if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.|[1-9][0-9]*)(((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?$ ]]
 then
     if [[ "$1" != "next" ]]
@@ -222,7 +245,27 @@ fi
 
 if [[ "$active" == "$1" ]]
 then
+    if [[ $remove == true ]]
+    then
+        printf "Unabled to remove active version %s\n" "$active"
+        exit 1
+    fi
+
     printf "Go version ${bold}%s${normal} is already active\n" "$1"
+    exit 0
+fi
+
+if [[ $remove == true ]]
+then
+    if [[ ! -d "$gvmroot/$1" ]]
+    then
+        printf "Go version %s does not exist\n" "$1"
+        exit 1
+    fi
+
+    printf "Removing Go version %s\n" "$1"
+    rm -rf "${gvmroot:?}/$1"
+
     exit 0
 fi
 
