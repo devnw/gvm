@@ -93,6 +93,6 @@ which is then added to the beginning of the PATH.
 
 ```bash
 mkdir -p $HOME/bin
-echo "export PATH=$HOME/bin:\$PATH" >> $HOME/.bashrc
+echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
 source $HOME/.bashrc
 ```
