@@ -52,10 +52,15 @@ help() {
         ${bold}gvm <command> [arguments]${normal}
 
     The commands are:
-        ${bold}<go version>${normal}  Install or Change Specific Go Version
-            ${bold}-s${normal} Silent Mode (No Prompts)
-            ${bold}-r${normal} Remove Go Version
-        ${bold}ls${normal}            List Installed Go Versions
+        ${bold}<go version>${normal}    Install or Change Specific Go Version
+            ${bold}-s${normal}              Silent Mode (No Prompts)
+            ${bold}-r${normal}              Remove Go Version
+
+        ${bold}ls${normal}              List Installed Go Versions
+        
+        ${bold}clean${normal}           Remove inactive Go Versions
+
+        ${bold}-h|--help|help${normal}  Print this help text
     
     ${bold}Examples:${normal}
       To install or activate a released version
@@ -95,6 +100,24 @@ installed() {
     done
 }
 
+clean() {
+    for dir in "$gvmroot"/*
+    do
+        dir=${dir%*/}
+        trimmed=${dir##*/}
+
+        # Ignore the symlink dir
+        if [[ $trimmed != "go" ]]
+        then
+            # Remove the non active versions
+            if [[ "$active" != "$trimmed" ]]
+            then
+                rm -rf "$dir"
+            fi
+        fi
+    done
+}
+
 for flag in "$@"
 do
     case $flag in
@@ -120,6 +143,10 @@ do
         ;;
     -r)
         remove=true
+        ;;
+    clean)
+        clean
+        exit 0
         ;;
     *);;
     esac
