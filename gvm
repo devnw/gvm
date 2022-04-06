@@ -370,7 +370,7 @@ then
             fail "$(printf "Unable to move to %s\n" "$srcd/src/")"
         fi
 
-        if ! ./all.bash
+        if ! GOROOT_BOOTSTRAP="$(which go)" ./all.bash
         then
 
             # Only fail if the go binary wasn't properly built
