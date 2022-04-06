@@ -8,7 +8,9 @@ Go Version Manager
 
 ## Install
 
-To use the command below directly ensure that $HOME/bin is in your PATH.
+To use the command below directly ensure that $HOME/bin is in your PATH. For an
+example of how to add $HOME/bin to your PATH [click
+here.](#example-for-how-to-add-homebin-to-your-path)
 
 ```bash
 curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
@@ -18,11 +20,29 @@ curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
 ## Updating gvm
 
 `gvm` will automatically detect if there is a newer version available for the
-installed `gvm` tag and give the user the option to update. If the user chooses
-to update, the `gvm` command will be updated to the latest version and re-run
-the updated script instead.
+installed `gvm` tag and give the user the option to update (**NOTE** This does
+NOT work for semver tags). If the user chooses to update, the `gvm` command will
+be updated to the latest version and re-run the updated script instead.
 
 ## Usage
+
+`gvm <command> [arguments]`
+
+### Available Commands
+
+`<go version>`    Install or Change Specific Go Version
+
+* `-s`             Silent Mode (No Prompts)
+
+* `-r`             Remove Go Version
+
+`ls`              List Installed Go Versions
+
+`clean`           Remove inactive Go Versions
+
+`-h` | `--help` | `help`  Print this help text
+
+## Installation Example
 
 To install a released version of `Go` use the following command.
 
@@ -34,6 +54,12 @@ If this version of Go has been previously installed, the
 link will be updated activating that version. If the version
 is not installed however `gvm` will install it, then link it.
 
+To remove a version
+
+```bash
+gvm 1.17.5 -r
+```
+
 ### Development Version
 
 `gvm` supports installing the current development version of `Go`
@@ -44,17 +70,29 @@ To install the current development version of `Go` use the following command.
 gvm next
 ```
 
-**NOTE:** If you have previously installed the development version of `Go` you **must** pass the `--update` flag if you want to
-build the latest development version, otherwise it will keep using the previously compiled development version.
+**NOTE:** If you have previously installed the development version of `Go` you
+**must** pass the `--update` flag if you want to build the latest development
+version, otherwise it will keep using the previously compiled development
+version.
 
 ## How it works
 
-`gvm` creates a directory at `$HOME/.gvm` and stores all of the Go versions in it. It then creates a symlink to the
-currently active version at `$HOME/.gvm/go` which is then
-added to the beginning of the PATH.
+`gvm` creates a directory at `$HOME/.gvm` and stores all of the Go versions in
+it. It then creates a symlink to the currently active version at `$HOME/.gvm/go`
+which is then added to the beginning of the PATH.
 
 ## Supported OSes and Architectures
 
-- Linux (ARM64 / AMD64)
-- Mac OS X (ARM64 / AMD64)
-- FreeBSD
+* Linux (ARM64 / AMD64)
+* Mac OS X (ARM64 / AMD64)
+* FreeBSD (ARM64 / AMD64)
+
+## Examples
+
+### Example for How to Add $HOME/bin to your PATH
+
+```bash
+mkdir -p $HOME/bin
+echo "export PATH=$HOME/bin:\$PATH" >> $HOME/.bashrc
+source $HOME/.bashrc
+```

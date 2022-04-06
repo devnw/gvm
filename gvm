@@ -62,10 +62,10 @@ help() {
     
     ${bold}Examples:${normal}
       To install or activate a released version
-      ${bold}gvm  1.17.5${normal}
+      ${bold}gvm 1.17.5${normal}
 
       To remove a version
-      ${bold}gvm  1.17.5 -r${normal}
+      ${bold}gvm 1.17.5 -r${normal}
 
     ${bold}DEVELOPMENT VERSION:${normal}
       To install or activate the development version
