@@ -57,10 +57,10 @@ help() {
             ${bold}-r${normal}              Remove Go Version
 
         ${bold}ls${normal}              List Installed Go Versions
-        
+
         ${bold}clean${normal}           Remove inactive Go Versions
 
-        ${bold}-h|--help|help${normal}  Print this help text
+        ${bold}-h | --help | help${normal}  Print this help text
     
     ${bold}Examples:${normal}
       To install or activate a released version
@@ -481,5 +481,9 @@ then
         printf "GVM is shadowed by %s in your PATH. Please update your PATH to use %s first\n" \
         "$pathgo" \
         "$gvmbin"
+
+        exit 1
     fi
+
+    printf "Go %s Active\n" "$version"
 fi
