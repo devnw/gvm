@@ -411,7 +411,6 @@ else
     then
 
         pkg="go$version.$os-$arch$extention"
-        echo $pkg
         url="$dlroot$pkg"
         pkgDir="$gvmroot/$pkg"
         
@@ -458,7 +457,7 @@ printf "Updating symlink %s => %s\n" "$lnsrc" "$gvmroot"
 if [[ "$os" == "windows" ]] 
 then 
     printf "Removing %s/go if the directory exists\n" "$gvmroot"
-    rm -rf $gvmroot/go 
+    rm -rf "$gvmroot/go"
 fi
 
 if ! ln -sf "$lnsrc" "$gvmroot"
