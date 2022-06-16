@@ -2,7 +2,7 @@
 
 ###############################################################################
 # GENERATED VERSION! DO NOT CHANGE!                                           #
-SCRIPTVERSION="local-dev"
+SCRIPTVERSION="latest"
 ###############################################################################
 
 # Static variable definintions
@@ -176,8 +176,15 @@ upgrade() {
     curl -sL "$GVMURL" > .gvm.tmp
                     
     # shellcheck disable=SC2002
-    DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
     
+    # Gitbash/Windows certutil with explit sha256 can be used
+    if [[ "$OSTYPE" == "msys"* ]] 
+    then
+        DOWNLOADEDSUM=$(certutil -hashfile .gvm.tmp sha256 | tail -n2 | head -n1)
+    else 
+        DOWNLOADEDSUM=$(cat .gvm.tmp | shasum -a 256)
+    fi 
+
     if [[ $DOWNLOADEDSUM != "$EXPECTEDSUM" ]]
     then
         printf "Checksum does not match new version of GVM [%s]\n" "$SCRIPTVERSION"
@@ -226,7 +233,17 @@ update() {
         EXPECTEDSUM=$(curl -sL "$SUMPATH")
     
         # shellcheck disable=SC2086
-        FILESUM=$(cat $0 | shasum -a 256)
+
+          if [[ "$OSTYPE" == "msys"* ]] 
+        then
+            FILESUM=$(certutil -hashfile $0 sha256 | tail -n2 | head -n1)
+            EXPECTEDSUM=$(curl -sL "$SUMPATH" | sed 's/  -//')  # ⚠️ additional 2xspace + dash may also need to be addressed on unix installs
+        else 
+            FILESUM=$(cat $0 | shasum -a 256)
+            EXPECTEDSUM=$(curl -sL "$SUMPATH")
+        fi 
+
+        
 
         if [[ "$EXPECTEDSUM" != "Not Found" ]]
         then
@@ -294,6 +311,7 @@ then
 fi
 
 arch="amd64"
+extention=".tar.gz"
 if uname -a | grep "arm64"&> /dev/null
 then
     arch="arm64"
@@ -306,6 +324,11 @@ then
 elif [[ "$OSTYPE" == "linux"* ]]
 then
     os="linux"
+elif [[ "$OSTYPE" == "msys"* ]]
+then
+    os="windows"
+    arch="amd64"
+    extention=".zip"
 elif [[ "$OSTYPE" == "freebsd"* ]]
 then
     os="freebsd"
@@ -386,7 +409,9 @@ then
 else
     if [[ ! -d "$versionroot" ]]
     then
-        pkg="go$version.$os-$arch.tar.gz"
+
+        pkg="go$version.$os-$arch$extention"
+        echo $pkg
         url="$dlroot$pkg"
         pkgDir="$gvmroot/$pkg"
         
@@ -407,10 +432,18 @@ else
             fail "$(printf "Unable to create %s\n" "$versionroot")"
         fi
 
-        if ! tar -C "$versionroot" -xzf "$pkgDir"
-        then
-            fail "$(printf "Unable to extract %s\n" "$pkgDir" rm -rf "$versionroot")"
-        fi
+        if [[ "$extention" == ".zip" ]]
+        then 
+             if ! unzip -qd "$versionroot" "$pkgDir"
+            then 
+                fail "$(printf "Unable to zip extract %s\n" "$pkgDir" rm -rf "$versionroot")"
+            fi 
+        else 
+            if ! tar -C "$versionroot" -xzf "$pkgDir"
+            then
+                fail "$(printf "Unable to tar extract %s\n" "$pkgDir" rm -rf "$versionroot")"
+            fi
+        fi 
             
         rm "$pkgDir"
     fi
@@ -420,6 +453,14 @@ fi
 lnsrc="$versionroot/go"
 
 printf "Updating symlink %s => %s\n" "$lnsrc" "$gvmroot"
+
+#Windows + Gitbash require an explicit delete of the previously linked folder 
+if [[ "$os" == "windows" ]] 
+then 
+    printf "Removing %s/go if the directory exists\n" "$gvmroot"
+    rm -rf $gvmroot/go 
+fi
+
 if ! ln -sf "$lnsrc" "$gvmroot"
 then
     fail "$(printf "Unable to symlink directory %s\n" "$lnsrc")"
