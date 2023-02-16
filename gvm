@@ -14,7 +14,7 @@ srcd="$gvmroot/next"
 version="$1"
 versionroot="$gvmroot/$version"
 golanggit="https://go.googlesource.com/go"
-dlroot="https://dl.google.com/go/"
+dlroot="https://go.dev/dl/"
 update=$2
 branch="master"
 remove=false
@@ -272,7 +272,7 @@ update() {
 # Determine if the script is out of date and offer to update
 update "$@"
 
-if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.|[1-9][0-9]*)(((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?$ ]]
+if [[ ! $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(\.?|[1-9][0-9]*)(((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?$ ]]
 then
     if [[ "$1" != "next" ]]
     then
@@ -420,7 +420,7 @@ else
         fi
 
         printf "Downloading %s\n" "$url"
-        if ! curl -f "$url" > "$pkgDir"
+        if ! curl -fsL "$url" > "$pkgDir"
         then
             fail "$(printf "Unable to curl %s\n" "$url")"
         fi
