@@ -20,3 +20,6 @@ fi
 # Source ~/.profile to reflect changes immediately in the current shell
 source $HOME/.profile
 echo "Current shell PATH updated."
+
+curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
+    > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
