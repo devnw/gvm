@@ -23,3 +23,5 @@ echo "Current shell PATH updated."
 
 curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
     > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
+
+source ~/.profile
