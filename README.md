@@ -8,13 +8,11 @@ Go Version Manager
 
 ## Install
 
-To use the command below directly ensure that $HOME/bin is in your PATH. For an
-example of how to add $HOME/bin to your PATH [click
-here.](#example-for-how-to-add-homebin-to-your-path)
-
 ```bash
-curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
-    > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
+curl -o- https://raw.githubusercontent.com/devnw/gvm/main/install.sh | bash
+```
+```bash
+wget -qO- https://raw.githubusercontent.com/devnw/gvm/main/install.sh | bash
 ```
 
 ## Updating gvm
@@ -86,13 +84,3 @@ which is then added to the beginning of the PATH.
 * Linux (ARM64 / AMD64)
 * Mac OS X (ARM64 / AMD64)
 * FreeBSD (ARM64 / AMD64)
-
-## Examples
-
-### Example for How to Add $HOME/bin to your PATH
-
-```bash
-mkdir -p $HOME/bin
-echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
-source $HOME/.bashrc
-```
