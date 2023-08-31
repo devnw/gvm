@@ -3,8 +3,8 @@
 # Create the bin directory in the user's home if it doesn't exist
 mkdir -p $HOME/bin
 
-# Check if the PATH update already exists in ~/.profile
-grep -qxF 'export PATH=$HOME/bin:$PATH' $HOME/.profile
+# Check if $HOME/bin already exists in the PATH in ~/.profile
+grep -q "$HOME/bin" $HOME/.profile
 
 # $? is a special variable that holds the exit status of the last command executed
 # grep will return 0 if the line is found, and 1 otherwise
@@ -24,4 +24,4 @@ echo "Current shell PATH updated."
 curl -L https://github.com/devnw/gvm/releases/download/latest/gvm \
     > $HOME/bin/gvm && chmod +x $HOME/bin/gvm
 
-source ~/.profile
+source $HOME/.profile
