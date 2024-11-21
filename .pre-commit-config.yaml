@@ -1,26 +1,46 @@
+exclude: '^$'
+fail_fast: true 
 repos:
--   repo: https://github.com/Contrast-Labs/detect-secrets
-    rev: v1.1.2
+  -   repo: https://github.com/Yelp/detect-secrets
+      rev: v1.5.0
+      hooks:
+      -   id: detect-secrets
+          name: Detect secrets
+          language: python
+          entry: detect-secrets-hook
+          args: [
+            '--baseline', 
+            '.secrets.baseline',
+            '--exclude-files',
+            '(_test\.go$|/testdata/|gomod2nix.toml)',
+            ]
+  - repo: https://github.com/mrtazz/checkmake.git
+    rev: 0.2.2
     hooks:
-    -   id: detect-secrets
-        name: Detect secrets
-        language: python
-        entry: detect-secrets-hook
-        args: ['--baseline', '.secrets.baseline']
--   repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.8.0
+    -   id: checkmake
+  -   repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v5.0.0
+      hooks:
+      -   id: check-json
+      -   id: check-merge-conflict
+      -   id: check-yaml
+      -   id: end-of-file-fixer
+      -   id: check-symlinks
+  - repo: https://github.com/markdownlint/markdownlint
+    rev: v0.12.0
     hooks:
-    -   id: shellcheck
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    -   id: markdownlint
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.31.0
     hooks:
-    -   id: check-json
-    -   id: check-added-large-files
-    -   id: pretty-format-json
-    -   id: check-merge-conflict
-    -   id: check-yaml
-    -   id: check-toml
--   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.30.0
+      - id: commitizen
+      - id: commitizen-branch
+        stages: [push]
+  - repo: local
     hooks:
-    -   id: markdownlint-fix
+      - id: makefile
+        name: Run Makefile Lint
+        entry: make
+        args: [pre-commit]
+        language: system
+        pass_filenames: false
